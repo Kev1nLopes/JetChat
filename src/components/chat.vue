@@ -12,10 +12,22 @@
          
     </form>
     <div class="chat" v-if="join">
-        <ul class="text-area">
-            <li v-for="(item, index) in listMessages" :key="index">{{user}} :{{item.text}}</li>
+        <ul class="rooms-area">
+            <h1>ROOMS</h1>       
+                   <li  v-for="(item, index) in users" :key="index">{{item.nome}}</li>
+             
+            
         </ul>
-        <input type="text" name="message" id="message" @keypress.enter="sendMessage">
+        <ul class="text-area">
+            <h1>BATE PAPO UOL</h1>
+
+                <li v-for="(item, index) in listMessages" :key="index">{{msg.user}} :  </li>
+            <div class="message-area">
+            <input type="text" name="message" id="message" @keypress.enter="sendMessage" placeholder="Digite uma mensagem">
+            </div>
+        </ul>
+        
+        
     </div>
    
 
@@ -31,7 +43,8 @@ export default {
             join: false,
             user: "",
             message: "",
-            listMessages: []
+            listMessages: [],
+            users: []
         }
     },
     methods:{
@@ -45,10 +58,10 @@ export default {
                 this.user = name;
                 this.join = true;
                 this.socketInstance = io("http://localhost:3000");
-                this.socketInstance.on('sendMessage', msg =>{
-                this.listMessages.push(msg);
-            })
-                this.socketInstance.emit('login', (name, password));
+                this.socketInstance.emit('login', ({name: name, password: password}));
+                this.socketInstance.on('users', users =>{
+                    this.users = users
+                })
            }
            
        },
@@ -58,15 +71,19 @@ export default {
                let msg = {
                    id: new Date().getTime(),
                    text: inputMsg.value.trim(),
-                   user: this.user,
-                   
+                   user: this.user
                }
-               this.socketInstance.emit('message', msg)
                inputMsg.value = '';
+               this.socketInstance.emit('message', msg);
+               this.socketInstance.on('sendMessage', m =>{
+                    this.listMessages = m;
+                    console.log(this.listMessages);
+                   
+            })
            }
        }
-    },
-    emits: ['handleForm']
+    }
+  
 }
 </script>
 
@@ -77,6 +94,7 @@ form{
     align-items: center;
     height: 40vh;
     justify-content: space-evenly;
+    max-width: 500px;
     width: 100%;
     background-color: rgb(9, 9, 43);
     border-radius: 30px;
@@ -103,8 +121,6 @@ form{
         &:hover::placeholder{
             position: absolute;
             text-align: center;
-            
-
         }
 
     }
@@ -115,11 +131,45 @@ form{
      }
     input[type="submit"]:hover{
        transition: 1s;
-       background: linear-gradient(146deg, rgba(4,16,139,1) 18%, rgba(55,63,152,1) 77%, rgba(140,16,193,1) 100%); ;
+       background: linear-gradient(146deg, rgba(4,16,139,1) 18%, rgba(55,63,152,1) 77%, rgba(140,16,193,1) 100%);
        
     } 
 }
 .chat{
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    .rooms-area{
+        width: 300px;
+        background-color: red;
+        margin: 0px
+
+    }
+    .text-area{
+        background-color: blue;
+        position: relative;
+        margin: 0px;
+        flex: 1;
+        
+        .message-area{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 30px;
+            input{
+                background-color: rgba($color: #0000, $alpha: 1.0);
+                height: inherit;
+                width: 90%;
+            
+            } 
+            
+        }
+    }
     ul,li{
         text-decoration: none;
         list-style-type: none;

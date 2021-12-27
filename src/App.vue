@@ -1,7 +1,7 @@
 <template>
   <div class="main">
       
-     <chat @handleForm="enviarDados" />
+     <chat/>
   </div>
  
 </template>
@@ -15,7 +15,9 @@ export default {
     chat
   },
   data(){
+    return {
 
+      }
   },
   methods: {
     enviarDados(e){
@@ -48,9 +50,11 @@ export default {
         margin: 0;
         padding: 0;
         .main{
-          max-width: 350px;
-          min-width: 100px;
+          height: 100vh;
           width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
    
   }

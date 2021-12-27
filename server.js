@@ -14,22 +14,24 @@ const io = new Server(server, {
 let users = [];
 
 io.on("connection", (socket) => {
-    socket.on('login', (nome, password) => {
+    socket.on('login', (data) => {
         const user = {
-            nome,
+            nome: data.name,
             id: socket.id,
-            password
+            password: data.password
         }
-        users.push(user);
-        io.emit('new login', users);
+       users.push(user);
+       console.log('Usuario conectado ' + user.nome);
+       socket.emit('users', users);
     })
 
-    socket.on('message', (data) => {
-        socket.broadcast.emit("sendMessage", data)
+    socket.on('message', (msg) => {
+        socket.emit('sendMessage', msg);
+
     })
 
     socket.on("disconnect", () => {
-        console.log(`User disconnect ${socket.id}`);
+        // console.log(`User disconnect ${socket.id}`);
     })
 });
 
