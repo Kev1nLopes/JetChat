@@ -1,19 +1,18 @@
 <template>
   <div class="main">
       
-     <formulario @handleForm="enviarDados" />
+     <chat @handleForm="enviarDados" />
   </div>
  
 </template>
 
 <script>
-import formulario from './components/form.vue'
-
+import chat from './components/chat.vue'
 
 export default {
   name: 'App',
   components: {
-    formulario
+    chat
   },
   data(){
 

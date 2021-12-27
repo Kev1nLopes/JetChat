@@ -1,6 +1,6 @@
 <template>
 
-    <form :v-if="join" action="" @submit="handleForm">
+    <form v-if="!join" action="" @submit="handleForm">
         <div class="logo">
             <img src="../assets/logo1.png" alt="" width="512" height="512">
             <h1>JetChat</h1>
@@ -8,34 +8,62 @@
         
          <input type="text" name="name" id="name" placeholder="informe seu nome:">
          <input type="password" name="password" id="password" placeholder="informe sua senha:">
-         <input type="submit" value="Enviar" id="btn-enviar">
+         <input type="submit" value="Enviar" id="btn-enviar" @click="submit">
          
     </form>
+    <div class="chat" v-if="join">
+        <ul class="text-area">
+            <li v-for="(item, index) in listMessages" :key="index">{{user}} :{{item.text}}</li>
+        </ul>
+        <input type="text" name="message" id="message" @keypress.enter="sendMessage">
+    </div>
    
 
 </template>
 
 <script>
-const io = require('socket.io-client')
+import io from "socket.io-client";
 
 export default {
     name: 'formulario',
     data() {
         return {
-            image: './src/assets/logo1.png',
             join: false,
+            user: "",
+            message: "",
+            listMessages: []
         }
     },
     methods:{
-       handleForm(e){
+       submit(e){
            e.preventDefault();
-           let name = document.getElementById('name');
-           let password = document.getElementById('password'); 
-           if(name != '' && password != ''){
-               alert("Po faz o bagulho direito ai o paunocu")
+            let name = document.querySelector("#name");
+            let password = document.querySelector("#password");
+            if(name.value != '' && password.value != ''){
+                name = name.value.trim();
+                password = password.value.trim();
+                this.user = name;
+                this.join = true;
+                this.socketInstance = io("http://localhost:3000");
+                this.socketInstance.on('sendMessage', msg =>{
+                this.listMessages.push(msg);
+            })
+                this.socketInstance.emit('login', (name, password));
            }
-           e.preventDefault();
-           this.join = true;
+           
+       },
+       sendMessage(){
+           let inputMsg = document.querySelector("#message");
+           if(inputMsg.value != ''){
+               let msg = {
+                   id: new Date().getTime(),
+                   text: inputMsg.value.trim(),
+                   user: this.user,
+                   
+               }
+               this.socketInstance.emit('message', msg)
+               inputMsg.value = '';
+           }
        }
     },
     emits: ['handleForm']
@@ -89,9 +117,15 @@ form{
        transition: 1s;
        background: linear-gradient(146deg, rgba(4,16,139,1) 18%, rgba(55,63,152,1) 77%, rgba(140,16,193,1) 100%); ;
        
+    } 
+}
+.chat{
+    ul,li{
+        text-decoration: none;
+        list-style-type: none;
+        margin: 5px;
+        color: white;
     }
-   
-   
 }
   
    
