@@ -6,24 +6,24 @@
             <h1>JetChat</h1>
         </div>
         
-         <input type="text" name="name" id="name" placeholder="informe seu nome:">
-         <input type="password" name="password" id="password" placeholder="informe sua senha:">
+         <input type="text" name="name" id="name" placeholder="informe seu nome:" autocomplete="off">
+         <input type="password" name="password" id="password" placeholder="informe sua senha:" autocomplete="off">
          <input type="submit" value="Enviar" id="btn-enviar" @click="submit">
          
     </form>
     <div class="chat" v-if="join">
         <ul class="rooms-area">
             <h1>ROOMS</h1>       
-                   <li  v-for="(item, index) in users" :key="index">{{item.nome}}</li>
+                   
              
             
         </ul>
         <ul class="text-area">
             <h1>BATE PAPO UOL</h1>
 
-                <li v-for="(item, index) in listMessages" :key="index">{{msg.user}} :  </li>
+                <li v-for="(item, index) in listMessages" :key="index">{{item.author}} : {{item.text}}  </li>
             <div class="message-area">
-            <input type="text" name="message" id="message" @keypress.enter="sendMessage" placeholder="Digite uma mensagem">
+            <input type="text" name="message" id="message" @keyup.enter="sendMessage" placeholder="Digite uma mensagem">
             </div>
         </ul>
         
@@ -34,57 +34,68 @@
 </template>
 
 <script>
-import io from "socket.io-client";
+import io from 'socket.io-client';
+const socket = io('http://localhost:3000');
+let c = (el)=>document.querySelector(el);
+let cs = (el)=>document.querySelectorAll(el);
 
-export default {
-    name: 'formulario',
-    data() {
-        return {
-            join: false,
+export default{
+    data(){
+        return{
             user: "",
-            message: "",
+            users: [],
             listMessages: [],
-            users: []
+            join: false,
         }
     },
+    created(){
+        socket.on('alertMessage', msg =>{
+            alert(msg.author + ' Enviou uma mensagem');
+            this.listMessages.push(msg);
+        })
+        socket.on('showMessage', msg =>{
+            this.listMessages.push(msg);
+        })
+    },
     methods:{
-       submit(e){
-           e.preventDefault();
-            let name = document.querySelector("#name");
-            let password = document.querySelector("#password");
-            if(name.value != '' && password.value != ''){
-                name = name.value.trim();
-                password = password.value.trim();
-                this.user = name;
-                this.join = true;
-                this.socketInstance = io("http://localhost:3000");
-                this.socketInstance.emit('login', ({name: name, password: password}));
-                this.socketInstance.on('users', users =>{
-                    this.users = users
-                })
-           }
+        submit(e){
+            e.preventDefault();
+            let nome = c('#name');
+            let senha = c('#password');
+            if(nome.value != '' && senha.value !=''){
+                let user = {
+                    nome: nome.value.trim(),
+                    senha: senha.value.trim(),
+                    id: socket.id
+                }
+            this.user = user.nome;
+            this.users.push(user);
+            socket.emit('userLogin', user);
+            this.join = true;
+         }
+        },
+        sendMessage(){
+           let inputMsg = c('#message');
            
-       },
-       sendMessage(){
-           let inputMsg = document.querySelector("#message");
-           if(inputMsg.value != ''){
-               let msg = {
-                   id: new Date().getTime(),
-                   text: inputMsg.value.trim(),
-                   user: this.user
-               }
-               inputMsg.value = '';
-               this.socketInstance.emit('message', msg);
-               this.socketInstance.on('sendMessage', m =>{
-                    this.listMessages = m;
-                    console.log(this.listMessages);
-                   
-            })
-           }
-       }
+           if(inputMsg.value){
+            let msg = {
+                author: this.user,
+                text: inputMsg.value,
+            }
+            socket.emit('newMessage', msg);
+            inputMsg.value = '';
+            //Broadcast emit, para emitir uma notificacao de nova mensagem para outros usuarios e n para mim
+            
+        }
+
+
+
+        }
+
     }
-  
+
 }
+
 </script>
 
 <style lang="scss">

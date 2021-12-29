@@ -1,41 +1,32 @@
 const express = require('express');
 const http = require('http');
-const app = express();
+const {Server} = require('socket.io');
 
+const app = express();
 const server = http.createServer(app);
-const { Server } = require('socket.io');
 const io = new Server(server, {
     cors: {
         origin: "*",
-        methods: ['GET', 'POST']
+        methods: ["GET", "POST"],
+        credentials: true,
+
     }
 })
 
-let users = [];
 
-io.on("connection", (socket) => {
-    socket.on('login', (data) => {
-        const user = {
-            nome: data.name,
-            id: socket.id,
-            password: data.password
-        }
-       users.push(user);
-       console.log('Usuario conectado ' + user.nome);
-       socket.emit('users', users);
+
+io.on('connection', (socket)=>{
+    console.log('Conectado');
+    socket.on('userLogin', user=>{
+        socket.user = user;
+        console.log('new login');
     })
-
-    socket.on('message', (msg) => {
-        socket.emit('sendMessage', msg);
-
-    })
-
-    socket.on("disconnect", () => {
-        // console.log(`User disconnect ${socket.id}`);
+    socket.on('newMessage', msg =>{
+        socket.broadcast.emit('alertMessage', msg);
+        socket.emit('showMessage', msg);
     })
 });
 
-
-server.listen(3000, () => {
-    console.log("boa noite");
+server.listen(3000, ()=>{
+    console.log('server listening on port 3000');
 })
