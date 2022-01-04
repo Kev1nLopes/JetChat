@@ -28,11 +28,11 @@
             <h1>BATE PAPO UOL</h1>
                 <ul>
                     <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} : {{item.text}}  
-                        <i class="fas fa-chevron-down"></i>
-                        <ul v-if="showMsgMenu">
+                        <i class="fas fa-chevron-down" @click="showMsgMenu"></i>
+                        <ul v-if="msgMenu" class="msg-menu">
                             <li>Excluir mensagem</li>
                             <li @click="privateMessage">Mensagem Privada</li>
-                            <li>Responder Mensagem</li>
+                            <li>Responder</li>
                         </ul>
                     </li>
                 </ul>
@@ -81,7 +81,7 @@ export default{
             join: false,
             showModal: false,
             rooms: [],
-            showMsgMenu: false
+            msgMenu: false
         }
     },
     created(){
@@ -163,7 +163,13 @@ export default{
         },
         handleModal(){
             this.showModal = !this.showModal
+        },
+        showMsgMenu(e){
+            let ul = document.createElement('ul');
+            e.target.appendChild()
+            this.msgMenu = !this.msgMenu;
         }
+        
 
     }
 
@@ -254,19 +260,39 @@ form{
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-                li.msg{
-                padding: 5px;
+            position: absolute;
+            bottom: 30px;
+                .msg{
+                padding: 5px 30px 5px 10px;
                 display: inline-block;
                 background-color: rgb(158, 158, 158);
-                border: 1px solid rgb(163, 161, 161);
-                position: relative
+                border: 1px solid rgb(212, 211, 211);
+                position: relative;
                 i{
                     position:   absolute;
                     right: 0;
-                    top: 5px;
+                    top: 7px;
+                    right: 5px;
                 }
+                .msg-menu{
+                width: 180px;
+                position: absolute;
+                background-color: rgb(212, 211, 211);
+                border-radius: 5px;
+                top: -120px;
+                right: -80px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                li{
+                    border-bottom: 1px solid green;
+                    
+                    width: 80%;
+                }
+            }
             
             }
+            
         }
         
         
