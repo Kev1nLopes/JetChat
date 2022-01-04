@@ -13,17 +13,22 @@ const io = new Server(server, {
     }
 })
 
-
+let users = [];
 
 io.on('connection', (socket)=>{
     console.log('Conectado');
     socket.on('userLogin', user=>{
         socket.user = user;
-        console.log('new login');
+        users.push(user);
+        socket.broadcast.emit('messageLogin', user)
     })
     socket.on('newMessage', msg =>{
         socket.broadcast.emit('alertMessage', msg);
         socket.emit('showMessage', msg);
+    })
+    socket.on('create', (room)=>{
+        console.log("room created");
+        socket.join(room.roomName)
     })
 });
 
