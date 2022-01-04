@@ -20,7 +20,11 @@ io.on('connection', (socket)=>{
     socket.on('userLogin', user=>{
         socket.user = user;
         users.push(user);
-        socket.broadcast.emit('messageLogin', user)
+        socket.emit('messageLogin', user);
+        socket.broadcast.emit('messageLogin', user);
+        socket.emit('newUser', users);
+        socket.broadcast.emit('newUser', users);
+        
     })
     socket.on('newMessage', msg =>{
         socket.broadcast.emit('alertMessage', msg);
@@ -29,6 +33,12 @@ io.on('connection', (socket)=>{
     socket.on('create', (room)=>{
         console.log("room created");
         socket.join(room.roomName)
+    })
+    socket.on('disconnect', ()=>{
+        let updateUsers = users.filter(item => item.id != socket.user.id);
+        users = updateUsers;
+        socket.broadcast.emit('newUser', updateUsers);
+        socket.broadcast.emit('messageDisconnect', socket.user)
     })
 });
 

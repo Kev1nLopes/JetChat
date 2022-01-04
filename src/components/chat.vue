@@ -12,21 +12,29 @@
          
     </form>
     <div class="chat" v-if="join">
-        <ul class="rooms-area">
+        <div class="rooms-area">
             <h1>JetChat</h1>       
             <div class="create-room" @click="handleModal" >
-                Salas <i class="fas fa-door-open"></i>
+                Criar Sala <i class="fas fa-door-open"></i>
             </div>  
+            <h3>Online:</h3>
             <ul class="listOnline">
                 <li v-for="(item, index) in users" :key="index">{{item.nome}}</li>
             </ul>     
              
             
-        </ul>
+        </div>
         <div class="text-area">
             <h1>BATE PAPO UOL</h1>
                 <ul>
-                    <li v-for="(item, index) in listMessages" :key="index">{{item.author}} : {{item.text}}  </li>
+                    <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} : {{item.text}}  
+                        <i class="fas fa-chevron-down" @click="showMsgMenu"></i>
+                        <ul v-if="msgMenu" class="msg-menu">
+                            <li>Excluir mensagem</li>
+                            <li @click="privateMessage">Mensagem Privada</li>
+                            <li>Responder</li>
+                        </ul>
+                    </li>
                 </ul>
                 
             <div class="message-area">
@@ -41,22 +49,12 @@
             
             <div class="modal-select">
                 
-                <div class="criar-sala" @click="option = false">Criar</div>
-                <div class="buscar-sala" @click="option = true">Buscar</div>
+                <div class="criar-sala">Criar Sala</div>
                 <i class="fas fa-times-circle" @click="handleModal"></i>
             </div>
             <div class="modal-content">
-                <div class="criar-content" v-if="!option">
+                <div class="criar-content">
                      <input type="text" name="room" id="room" placeholder="Informe o nome da sala">
-                    <button @click="createRoom">Criar</button>
-                </div>
-                <div class="buscar-content" v-if="option">
-                     <select name="rooms" id="">
-                         <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
-                     </select>
                     <button @click="createRoom">Criar</button>
                 </div>
                 
@@ -83,10 +81,11 @@ export default{
             join: false,
             showModal: false,
             rooms: [],
-            option: false,
+            msgMenu: false
         }
     },
     created(){
+        
         socket.on('alertMessage', msg =>{
             alert(msg.author + ' Enviou uma mensagem');
             this.listMessages.push(msg);
@@ -99,7 +98,17 @@ export default{
             li.textContent = `${n.nome} Entrou`
             c('.text-area ul').appendChild(li);
         })
+        socket.on('messageDisconnect', u =>{
+            let li = document.createElement('li');
+            li.textContent = `${u.nome} Saiu`
+            c('.text-area ul').appendChild(li);
+        })
        
+    },
+    mounted(){
+        socket.on('newUser', users =>{
+            this.users = users;
+        })
     },
     methods:{
         submit(e){
@@ -154,7 +163,13 @@ export default{
         },
         handleModal(){
             this.showModal = !this.showModal
+        },
+        showMsgMenu(e){
+            let ul = document.createElement('ul');
+            e.target.appendChild()
+            this.msgMenu = !this.msgMenu;
         }
+        
 
     }
 
@@ -216,8 +231,9 @@ form{
     width: 100%;
     .rooms-area{
         width: 300px;
-        background-color: red;
+        background-color: rgb(23, 36, 0);
         margin: 0px;
+        color: white;
         .create-room{
             font-size: 18px;
             border-radius: 5px;
@@ -228,13 +244,57 @@ form{
                 color: green;
             }
         }
+        h3{
+            margin: 5px 10px;
+            text-align:start;
+        }
 
     }
     .text-area{
-        background-color: blue;
+        background: rgb(214, 174, 114);
         position: relative;
         margin: 0px;
         flex: 1;
+        ul{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: absolute;
+            bottom: 30px;
+                .msg{
+                padding: 5px 30px 5px 10px;
+                display: inline-block;
+                background-color: rgb(158, 158, 158);
+                border: 1px solid rgb(212, 211, 211);
+                position: relative;
+                i{
+                    position:   absolute;
+                    right: 0;
+                    top: 7px;
+                    right: 5px;
+                }
+                .msg-menu{
+                width: 180px;
+                position: absolute;
+                background-color: rgb(212, 211, 211);
+                border-radius: 5px;
+                top: -120px;
+                right: -80px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                li{
+                    border-bottom: 1px solid green;
+                    
+                    width: 80%;
+                }
+            }
+            
+            }
+            
+        }
+        
         
         .message-area{
             position: absolute;
@@ -304,8 +364,7 @@ form{
             }
         }
     }
-    .criar-content,
-    .buscar-content{
+    .criar-content{
         display: flex; 
         max-width: 300px;
         width: 100%;
@@ -319,9 +378,6 @@ form{
             width: 60px;
             margin-top: 10px;
             background-color: green;
-        }
-        select{
-            width: 100%;
         }
     }
 }
