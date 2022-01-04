@@ -12,12 +12,6 @@
          
     </form>
     <div class="chat" v-if="join">
-        <ul class="rooms-area">
-            <h1>ROOMS</h1>       
-                   
-             
-            
-        </ul>
         <ul class="text-area">
             <h1>BATE PAPO UOL</h1>
 
@@ -46,6 +40,7 @@ export default{
             users: [],
             listMessages: [],
             join: false,
+            sidebar: false,
         }
     },
     created(){
