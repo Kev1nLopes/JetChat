@@ -27,10 +27,10 @@
         <div class="text-area">
             <h1>BATE PAPO UOL</h1>
                 <ul>
-                    <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} : {{item.text}}  
-                        <i class="fas fa-chevron-down" @click="showMsgMenu"></i>
-                        <ul v-if="msgMenu" class="msg-menu">
-                            <li>Excluir mensagem</li>
+                    <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} :  {{item.text}}  
+                        <i class="fas fa-chevron-down" @click="item.msgMenu = !item.msgMenu"></i>
+                        <ul v-if="item.msgMenu" class="msg-menu">
+                            <li @click="delMsg(item)" class="delMsg">Excluir mensagem</li>
                             <li @click="privateMessage">Mensagem Privada</li>
                             <li>Responder</li>
                         </ul>
@@ -81,7 +81,7 @@ export default{
             join: false,
             showModal: false,
             rooms: [],
-            msgMenu: false
+            
         }
     },
     created(){
@@ -133,6 +133,8 @@ export default{
             let msg = {
                 author: this.user,
                 text: inputMsg.value,
+                msgMenu: false
+
             }
             socket.emit('newMessage', msg);
             inputMsg.value = '';
@@ -168,6 +170,10 @@ export default{
             let ul = document.createElement('ul');
             e.target.appendChild()
             this.msgMenu = !this.msgMenu;
+        },
+        delMsg(msg){
+            this.listMessages = this.listMessages.filter(item => item.text != msg.text);
+            console.log(this.listMessages)
         }
         
 
@@ -288,6 +294,9 @@ form{
                     border-bottom: 1px solid green;
                     
                     width: 80%;
+                }
+                .delMsg{
+                    cursor: pointer;
                 }
             }
             
