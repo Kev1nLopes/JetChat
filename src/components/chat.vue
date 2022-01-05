@@ -26,7 +26,7 @@
         </div>
         <div class="text-area">
             <h1>BATE PAPO UOL</h1>
-                <ul>
+                <ul class="listMessages">
                     <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} :  {{item.text}}  
                         <i class="fas fa-chevron-down" @click="item.msgMenu = !item.msgMenu"></i>
                         <ul v-if="item.msgMenu" class="msg-menu">
@@ -38,7 +38,16 @@
                 </ul>
                 
             <div class="message-area">
-            <input type="text" name="message" id="message" @keyup.enter="sendMessage" placeholder="Digite uma mensagem">
+            <input type="text" name="message" id="message" @keyup.enter="sendMessage" placeholder="Digite uma mensagem" autocomplete="off">
+            <div class="emojis">
+                <i class="far fa-smile" @click="showEmojiList"></i>
+                <div class="emojiList" v-if="showEmoji">
+                    <ul class="listEmojis">
+                        <li v-for="(item, index) in emojiList" :key="index" @click="emoji(item)"> {{item}} </li>
+                        
+                    </ul>
+                </div>
+            </div>
             </div>
         </div>
         
@@ -81,6 +90,11 @@ export default{
             join: false,
             showModal: false,
             rooms: [],
+            showEmoji: false,
+            emojiList: ['😁', '😂', '😃', '😄', '😅', '😆', '😉', '😊', '😊', '😋', '😌', '😍', '😏', '😒', '😓', '😔', '😖', '😘', '😚', '😜', '😝', '😞', '😠', '😡', '😢', '😣', '😤', '😥', '😨', '😩', '😪',  '😫',  '😭',  '😰',  '😱',  '😲',  '😳',  '😵',  '😷',  '😸',  '😹',  '😺',  '😻',  '🙅',  '🙆',  '🙈',  '🙉',  '🙊',  '🙌',  '🙏',  '✊'  ]
+            // emojiList: [
+            // 
+            // ]
             
         }
     },
@@ -97,11 +111,17 @@ export default{
             let li = document.createElement('li');
             li.textContent = `${n.nome} Entrou`
             c('.text-area ul').appendChild(li);
+            setTimeout(()=>{
+                li.style.display = 'none';
+            }, 5000)
         })
         socket.on('messageDisconnect', u =>{
             let li = document.createElement('li');
-            li.textContent = `${u.nome} Saiu`
+            li.textContent = `${u.nome} Saiu`;
             c('.text-area ul').appendChild(li);
+            setTimeout(()=>{
+                li.style.display = 'none';
+            }, 5000)
         })
        
     },
@@ -174,6 +194,12 @@ export default{
         delMsg(msg){
             this.listMessages = this.listMessages.filter(item => item.text != msg.text);
             console.log(this.listMessages)
+        },
+        showEmojiList(){
+            this.showEmoji = !this.showEmoji;
+        },
+        emoji(emoji){
+            c('#message').value += emoji
         }
         
 
@@ -183,7 +209,7 @@ export default{
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 form{
     display: flex;
     flex-direction: column;
@@ -261,13 +287,18 @@ form{
         position: relative;
         margin: 0px;
         flex: 1;
-        ul{
+        ul.listMessages{
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: flex-start;
             position: absolute;
-            bottom: 30px;
+            width: 100%;
+            top: 44px;
+            bottom: 50px;
+             overflow-y: scroll;
+           
+                
                 .msg{
                 padding: 5px 30px 5px 10px;
                 display: inline-block;
@@ -285,14 +316,14 @@ form{
                 position: absolute;
                 background-color: rgb(212, 211, 211);
                 border-radius: 5px;
-                top: -120px;
-                right: -80px;
+                top: -110px;
+                right: -150px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 li{
                     border-bottom: 1px solid green;
-                    
+                    bottom: 0;
                     width: 80%;
                 }
                 .delMsg{
@@ -307,21 +338,62 @@ form{
         
         .message-area{
             position: absolute;
-            bottom: 0;
+            bottom: 3px;
             left: 0;
             right: 0;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-evenly;
             width: 100%;
-            height: 30px;
+            height: 40px;
+
+            
             input{
                 background-color: rgba($color: #0000, $alpha: 1.0);
                 height: inherit;
                 width: 90%;
                 color: white;
-            
+                border-radius: 5px;
             } 
+            
+            .emojis{
+                position: relative;
+                i.far.fa-smile{
+                    font-size: 40px;
+                    color: rgba($color: #0000, $alpha: 1.0);
+                }
+                .emojiList{
+                    position: absolute;
+                    max-width: 300px;
+                    min-width: 250px;
+                    width: 100%;
+                    height: 200px;
+                    border-radius: 10px;
+                    left: -200px;
+                    bottom: 50px;
+                    background-color: white;
+                    overflow-y: scroll ;
+                    ul.listEmojis{
+                        width: inherit;
+                        top: 0;
+                        
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(30px, 50px));
+                        grid-template-rows: 30px;
+                        overflow-y: hidden;
+                        li{
+                            margin: 0px;
+                            &:hover{
+                                background-color: #ccc;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                    
+                    
+                    
+                }
+            }
             
         }
     }
@@ -332,8 +404,8 @@ form{
         color: white;
     }
 }
-.blur { // Make sure this color has an opacity of less than 1
-  backdrop-filter: blur(8px); // This be the blur
+.blur {
+  backdrop-filter: blur(8px); 
   height: 100vh;
     width: 100%;
     position: absolute;
