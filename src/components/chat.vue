@@ -39,6 +39,7 @@
                 
             <div class="message-area">
             <input type="text" name="message" id="message" @keyup.enter="sendMessage" placeholder="Digite uma mensagem" autocomplete="off">
+            <audio src="../assets/message.mp3"></audio>
             <div class="emojis">
                 <i class="far fa-smile" @click="showEmojiList"></i>
                 <div class="emojiList" v-if="showEmoji">
@@ -102,15 +103,26 @@ export default{
         
         socket.on('alertMessage', msg =>{
             alert(msg.author + ' Enviou uma mensagem');
-            this.listMessages.push(msg);
+            if(msg.text[0] == "*"){
+                msg.text = msg.text.slice(1, msg.text.length);
+                alert("mensagem importante, n consgui emitir o som");
+                this.listMessages.push(msg);
+                c("audio").play();
+            }else{
+                this.listMessages.push(msg);
+            }   
+            
         })
         socket.on('showMessage', msg =>{
-            this.listMessages.push(msg);
+            
+                this.listMessages.push(msg);
+            
+            
         });
         socket.on('messageLogin', n =>{
             let li = document.createElement('li');
             li.textContent = `${n.nome} Entrou`
-            c('.text-area ul').appendChild(li);
+            c('.listMessages').appendChild(li);
             setTimeout(()=>{
                 li.style.display = 'none';
             }, 5000)
