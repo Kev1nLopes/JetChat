@@ -31,7 +31,7 @@
                         <i class="fas fa-chevron-down" @click="item.msgMenu = !item.msgMenu"></i>
                         <ul v-if="item.msgMenu" class="msg-menu">
                             <li @click="delMsg(item)" class="delMsg">Excluir mensagem</li>
-                            <li @click="privateMessage">Mensagem Privada</li>
+                            <li @click="privateMessage(item.author, index)">Mensagem Privada</li>
                             <li>Responder</li>
                         </ul>
                     </li>
@@ -212,6 +212,13 @@ export default{
         },
         emoji(emoji){
             c('#message').value += emoji
+        },
+        privateMessage(author){
+            let a = this.users.filter(item => item.nome == author);
+            //Quando clicar em mensagem privada, abrir um modal com um input e o nome da pessoa que ele deseja enviar a mensagem
+            //Dar um socket broadcast.to(id).emit(msg);
+            //e fechou xesquedele
+            socket.emit('privateMessage', a);
         }
         
 
