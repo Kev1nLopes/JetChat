@@ -215,9 +215,10 @@ export default{
         },
         privateMessage(author){
             let a = this.users.filter(item => item.nome == author);
-            //Quando clicar em mensagem privada, abrir um modal com um input e o nome da pessoa que ele deseja enviar a mensagem
-            //Dar um socket broadcast.to(id).emit(msg);
-            //e fechou xesquedele
+            /*Quando clicar em mensagem privada, abrir um modal com um input
+            nome da pessoa que ele deseja enviar a mensagem
+            Dar um socket broadcast.to(id).emit(msg);
+            e fechou xesquedele*/
             socket.emit('privateMessage', a);
         }
         
