@@ -26,9 +26,20 @@
         </div>
         <div class="text-area">
             <h1>BATE PAPO UOL</h1>
-                <ul class="listMessages">
-                    <li class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} :  {{item.text}}  
+            <div v-if="main" class="out-room">Sair da sala</div>
+                <ul v-if="!main" class="listMessages">
+                    <li  class="msg" v-for="(item, index) in listMessages" :key="index" >{{item.author}} :  {{item.text}}  
                         <i class="fas fa-chevron-down" @click="item.msgMenu = !item.msgMenu"></i>
+                        <ul v-if="item.msgMenu" class="msg-menu">
+                            <li @click="delMsg(item)" class="delMsg">Excluir mensagem</li>
+                            <li @click="inviteGroup"></li>
+                            <li @click="privateMessage(item.author, index)">Mensagem Privada</li>
+                            <li>Responder</li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul v-else class="roomListMessages">
+                    <li class="msg" v-for="(item, index) in roomListMessages" :key="index">{{item.author}} : {{item.text}}
                         <ul v-if="item.msgMenu" class="msg-menu">
                             <li @click="delMsg(item)" class="delMsg">Excluir mensagem</li>
                             <li @click="privateMessage(item.author, index)">Mensagem Privada</li>
@@ -88,6 +99,7 @@ export default{
             user: "",
             users: [],
             listMessages: [],
+            roomListMessages: [],
             join: false,
             showModal: false,
             rooms: [],
@@ -276,7 +288,7 @@ form{
 }
 .chat{
     display: flex;
-    height: 100vh;
+    height: calc(100vh) ;
     width: 100%;
     .rooms-area{
         width: 300px;
@@ -303,6 +315,7 @@ form{
         background: rgb(214, 174, 114);
         position: relative;
         margin: 0px;
+        min-width: 250px;
         flex: 1;
         ul.listMessages{
             display: flex;
@@ -313,7 +326,6 @@ form{
             width: 100%;
             top: 44px;
             bottom: 50px;
-             overflow-y: scroll;
                 .msg{
                 padding: 5px 30px 5px 10px;
                 display: inline-block;
@@ -421,7 +433,7 @@ form{
 }
 .blur {
   backdrop-filter: blur(8px); 
-  height: 100vh;
+    height: 100vh;
     width: 100%;
     position: absolute;
 }
