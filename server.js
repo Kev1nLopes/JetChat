@@ -40,6 +40,9 @@ io.on('connection', (socket)=>{
         socket.broadcast.emit('newUser', updateUsers);
         socket.broadcast.emit('messageDisconnect', socket.user)
     })
+    socket.on('privateMessage', user =>{
+        socket.broadcast.to(user.id).emit('sendPrivateMsg');
+    })
 });
 
 server.listen(3000, ()=>{

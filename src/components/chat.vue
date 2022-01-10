@@ -31,7 +31,7 @@
                         <i class="fas fa-chevron-down" @click="item.msgMenu = !item.msgMenu"></i>
                         <ul v-if="item.msgMenu" class="msg-menu">
                             <li @click="delMsg(item)" class="delMsg">Excluir mensagem</li>
-                            <li @click="privateMessage">Mensagem Privada</li>
+                            <li @click="privateMessage(item.author, index)">Mensagem Privada</li>
                             <li>Responder</li>
                         </ul>
                     </li>
@@ -39,6 +39,7 @@
                 
             <div class="message-area">
             <input type="text" name="message" id="message" @keyup.enter="sendMessage" placeholder="Digite uma mensagem" autocomplete="off">
+            <audio src="../assets/message.mp3"></audio>
             <div class="emojis">
                 <i class="far fa-smile" @click="showEmojiList"></i>
                 <div class="emojiList" v-if="showEmoji">
@@ -99,15 +100,26 @@ export default{
         
         socket.on('alertMessage', msg =>{
             alert(msg.author + ' Enviou uma mensagem');
-            this.listMessages.push(msg);
+            if(msg.text[0] == "*"){
+                msg.text = msg.text.slice(1, msg.text.length);
+                alert("mensagem importante, n consgui emitir o som");
+                this.listMessages.push(msg);
+                c("audio").play();
+            }else{
+                this.listMessages.push(msg);
+            }   
+            
         })
         socket.on('showMessage', msg =>{
-            this.listMessages.push(msg);
+            
+                this.listMessages.push(msg);
+            
+            
         });
         socket.on('messageLogin', n =>{
             let li = document.createElement('li');
             li.textContent = `${n.nome} Entrou`
-            c('.text-area ul').appendChild(li);
+            c('.listMessages').appendChild(li);
             setTimeout(()=>{
                 li.style.display = 'none';
             }, 5000)
@@ -197,6 +209,14 @@ export default{
         },
         emoji(emoji){
             c('#message').value += emoji
+        },
+        privateMessage(author){
+            let a = this.users.filter(item => item.nome == author);
+            /*Quando clicar em mensagem privada, abrir um modal com um input
+            nome da pessoa que ele deseja enviar a mensagem
+            Dar um socket broadcast.to(id).emit(msg);
+            e fechou xesquedele*/
+            socket.emit('privateMessage', a);
         }
         
 
