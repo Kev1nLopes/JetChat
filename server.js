@@ -16,10 +16,16 @@ let users = [];
 
 io.on("connection", (socket) => {
     socket.on("newUser", (user) => {
+        users.push(user);
+        console.log("Novo usuario" + user.nome);
+        socket.emit('listUsers', users);
 
+    });
+    socket.on("teste", string =>{
+        console.log(string)
     })
     socket.on("disconnect", () => {
-
+        
     })
 })
 

@@ -4,6 +4,7 @@
       <div class="menu">
         <img src="../assets/img/logo1.png" alt="jetimob-logo">
         <h3>JetChat</h3>
+
       </div>
       <input type="text" name="nome" id="nome" placeholder="Informe seu nome">
       <button >Enviar</button>
@@ -16,16 +17,19 @@
 
 export default {
   name: 'Login',
+  
   data(){
     return{
-     
+    
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .login-form{
+    margin: 0;
+    padding: 0;
     height: 100vh;
     width: 100%;
     background: rgb(30,16,255);
@@ -65,5 +69,5 @@ export default {
     }
 
   }
-</style>>
+</style>
   
