@@ -13,20 +13,29 @@ const io = new Server(server, {
 })
 
 let users = [];
+let messages = [];
 
 io.on("connection", (socket) => {
-    socket.on("newUser", (user) => {
-        users.push(user);
-        console.log("Novo usuario" + user.nome);
-        socket.emit('listUsers', users);
-
-    });
-    socket.on("teste", string =>{
-        console.log(string)
-    })
-    socket.on("disconnect", () => {
-        
-    })
+  socket.on('newUser', user=>{
+      socket.user = user;
+      if(users.indexOf(user) != -1){
+          socket.emit('alreadyExist', user);
+      }
+      users.push(user);
+      socket.emit('listUsers', users);
+  })
+  socket.on('newMessage', m=>{
+      let msg = {
+          author: socket.user.nome,
+          text: m
+      }
+      messages.push(msg);
+      socket.emit('listMessages', messages);
+  })
+  socket.on('disconnect', ()=>{
+      users = users.filter((user)=> user.id != socket.id );
+      socket.broadcast.emit('updateUsers', users);
+  })
 })
 
 

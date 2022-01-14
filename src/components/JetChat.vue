@@ -1,7 +1,7 @@
 <template>
     <div class="rooms">
             <GlobalRoom v-if="room" />
-            <UserRoom v-else />
+           
     </div>
 
 </template>
