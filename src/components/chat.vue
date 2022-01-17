@@ -89,7 +89,7 @@
 
 <script>
 import io from 'socket.io-client';
-const socket = io('http://localhost:3000');
+const socket = io('http://149.28.53.210:3000');
 let c = (el)=>document.querySelector(el);
 let cs = (el)=>document.querySelectorAll(el);
 
