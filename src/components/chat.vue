@@ -1,5 +1,5 @@
 <template>
-
+    <div class="chat-area">
     <form v-if="!join" action="" @submit="handleForm">
         <div class="logo">
             <img src="../assets/logo1.png" alt="" width="512" height="512">
@@ -84,7 +84,7 @@
         </div>
     
    
-
+</div>
 </template>
 
 <script>
@@ -239,6 +239,10 @@ export default{
 </script>
 
 <style lang="scss" scoped>
+.chat-area{
+    width: 100%;
+    display: flex;
+    justify-content: center;
 form{
     display: flex;
     flex-direction: column;
@@ -286,6 +290,7 @@ form{
        
     } 
 }
+
 .chat{
     display: flex;
     height: calc(100vh) ;
@@ -489,6 +494,6 @@ form{
         }
     }
 }
-  
+}  
    
 </style>
